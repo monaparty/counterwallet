@@ -140,7 +140,7 @@
                           <div class="row">
                             <label class="col col-lg-4 control-label font-medlg"><span data-bind="locale: 'wager'"></span>:</label>
                             <div class="col col-lg-8">
-                              <input type="text"  name="wager" class="number form-control"  data-bind="value: $parent.wager, valueUpdate: 'input'" /> XCP
+                              <input type="text"  name="wager" class="number form-control"  data-bind="value: $parent.wager, valueUpdate: 'input'" /> <span data-bind="text: XCP"></span>
                               <br /><span class="invalid" data-bind="validationMessage: $parent.wager"></span>
                             </div>
                           </div> 
@@ -170,9 +170,9 @@
                           <div class="row" data-bind="visible: $parent.showAdvancedOptions || ($parent.counterBets().length == 0 && $parent.operatorOdds()==false)"> 
                             <label class="col col-lg-4 control-label font-medlg"><span data-bind="locale: 'odds'"></span>:</label> 
                             <div class="col col-lg-8">                
-                              <input name="odd" class="number form-control" data-bind="value: $parent.odd, valueUpdate: 'input'" type="text"/> XCP
+                              <input name="odd" class="number form-control" data-bind="value: $parent.odd, valueUpdate: 'input'" type="text"/> <span data-bind="text: XCP"></span>
                               <span class="invalid" data-bind="validationMessage: $parent.odd"></span>
-                              <br /><div class="note" data-bind="locale: 'odds_note'"></div>
+                              <br /><div class="note" data-bind="locale: 'odds_note', localeArgs: XCP"></div>
                             </div>                      
                           </div>
                           <div class="row" data-bind="visible: info_data.type=='cfd' && $parent.showAdvancedOptions">
@@ -215,26 +215,26 @@
                               <div class="progress-bar bg-color-greenLight" data-bind="attr: {style: 'width: '+$parent.greenPercent()+'%'}"></div>
                               <div class="progress-bar bg-color-redLight" data-bind="attr: {style: 'width: '+(100-$parent.greenPercent())+'%'}"></div>
                             </div>
-                            <span data-bind="locale: 'win'"></span> <span data-bind="text: $parent.odd"></span> <span data-bind="locale: 'for_every_xcp'"></span> 
+                            <span data-bind="locale: 'win'"></span> <span data-bind="text: $parent.odd"></span> <span data-bind="locale: 'for_every_xcp', localeArgs: {0:XCP, 1:XCP}"></span> 
                             <a data-bind="visible: operatorOdds" href="#" onclick="return false" title="The feed operator is actively managing the odds">
                               <span class="fa fa-crosshairs"></span>
                             </a>
                           </div>
                           <div>          
                             <label><span data-bind="locale: 'winnings'"></span>:</label>
-                            <span data-bind="text: $parent.counterwager + ' XCP'"></span>  
+                            <span data-bind="text: xcpValue($parent.counterwager)"></span>
                           </div>
                           <div>              
                             <label><span data-bind="locale: 'fee'"></span>:</label> 
-                            <span data-bind="text: $parent.fee + ' XCP'"></span>  
+                            <span data-bind="text: xcpValue($parent.fee)"></span>
                           </div> 
                           <div>              
                             <label><span data-bind="locale: 'matching'"></span>:</label> 
-                            <span data-bind="text: $parent.matchingVolume + ' XCP'"></span>  
+                            <span data-bind="text: xcpValue($parent.matchingVolume)"></span>
                           </div> 
                           <div>              
                             <label><span data-bind="locale: 'open'"></span>:</label> 
-                            <span data-bind="text: $parent.openingVolume + ' XCP'"></span>  
+                            <span data-bind="text: xcpValue($parent.openingVolume)"></span>
                           </div>
                         </div>
 
@@ -252,7 +252,7 @@
                             </tr>
                             <tr>
                               <td><b><span data-bind="locale: 'wager'"></span>:</b></td>
-                              <td><b><span data-bind="text: $parent.wager + ' XCP'"></span></b></td>
+                              <td><b><span data-bind="text: xcpValue($parent.wager)"></span></b></td>
                             </tr>
                             <tr data-bind="visible: info_data.type=='binary'">          
                               <td><b><span data-bind="locale: 'topic'"></span>:</b></td>
@@ -274,7 +274,7 @@
                             </tr>
                             <tr data-bind="visible: $parent.fee>=0">              
                               <td><b><span data-bind="locale: 'fee'"></span>:</b></td> 
-                              <td><b><span data-bind="text: $parent.fee + ' XCP'"></span></b></td>  
+                              <td><b><span data-bind="text: xcpValue($parent.fee)"></span></b></td>
                             </tr>
                           </tbody>
                         </table>

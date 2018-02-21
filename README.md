@@ -1,21 +1,22 @@
-[![Build Status Travis](https://travis-ci.org/CounterpartyXCP/counterwallet.svg?branch=develop)](https://travis-ci.org/CounterpartyXCP/counterwallet)
-[![Build Status Circle](https://circleci.com/gh/CounterpartyXCP/counterwallet.svg?&style=shield)](https://circleci.com/gh/CounterpartyXCP/counterwallet)
-[![Slack Status](http://slack.counterparty.io/badge.svg)](http://slack.counterparty.io)
+[![Build Status Travis](https://travis-ci.org/monaparty/counterwallet.svg?branch=develop)](https://travis-ci.org/monaparty/counterwallet)
+[![Build Status Circle](https://circleci.com/gh/monaparty/counterwallet.svg?&style=shield)](https://circleci.com/gh/monaparty/counterwallet)
+<!-- [![Slack Status](http://slack.counterparty.io/badge.svg)](http://slack.counterparty.io) -->
 
 Counterwallet
 ================
 
-Online Webwallet for [Counterparty](http://www.counterparty.io).
+Online Webwallet for [Monaparty](http://www.monaparty.me).
 
-Originally based off of [Carbonwallet](http://www.carbonwallet.com) (however virtually all the original code has been removed or rewritten).
+Originally based off of [Carbonwallet](http://www.carbonwallet.com) (however virtually all the original code has been removed or rewritten)
+and of [Counterparty](http://www.counterparty.io).
 
 
 Production Systems
 -------------------
 
-* Main page: **[counterwallet.io](https://counterwallet.io/)**
-* Primary server -- Mainnet: **[wallet.counterwallet.io](https://wallet.counterwallet.io/)**
-* Primary server -- Testnet: **[wallet-testnet.counterwallet.io](https://wallet-testnet.counterwallet.io/)**
+* Main page: **[Monaparty](http://www.monaparty.me/)**
+* Primary server -- Mainnet: **[wallet.monaparty.me](https://wallet.monaparty.me/)**
+* Primary server -- Testnet: **[wallet.monaparty.me](https://wallet-testnet.monaparty.me/)**
 
 
 Features

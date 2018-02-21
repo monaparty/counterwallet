@@ -79,8 +79,8 @@
                       <div style="padding-top:10px">
                         <label for="asset2Raw" class="control-label font-medlg"  data-bind="locale: 'token_2'"></label>
                         <div class="btn-group buySellBtnGroup" data-toggle="buttons" style="margin-bottom:0">
-                          <label class="radioBtn btn" data-bind="css: { 'btn-success': selectedQuoteAsset() == 'XCP', 'active': selectedQuoteAsset() == 'XCP'}">
-                            <input type="radio" value="XCP" data-bind="btnGroupChecked: selectedQuoteAsset">XCP</label>
+                          <label class="radioBtn btn" data-bind="css: { 'btn-success': selectedQuoteAsset() == XCP, 'active': selectedQuoteAsset() == XCP}">
+                            <input type="radio" data-bind="btnGroupChecked: selectedQuoteAsset, value: XCP"><span data-bind="text: XCP"></span></label>
                           <label class="radioBtn btn" data-bind="css: { 'btn-success': selectedQuoteAsset() == 'Other', 'active': selectedQuoteAsset() == 'Other'}">
                             <input type="radio" value="Other" data-bind="btnGroupChecked: selectedQuoteAsset">Other</label>
                         </div>

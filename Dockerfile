@@ -80,10 +80,9 @@ RUN git rev-parse HEAD
 RUN npm -g install npm@4.6.1
 RUN npm config set strict-ssl false
 ENV PHANTOMJS_CDNURL="http://cnpmjs.org/downloads"
-RUN npm install -g bower grunt mocha-phantomjs
-RUN cd src; bower --allow-root --config.interactive=false update; cd ..
-RUN npm update
-RUN grunt build
+RUN npm run bower -- --allow-root --config.interactive=false update
+RUN npm install
+RUN npm run prepublish
 RUN cp -a /counterwallet/counterwallet.conf.json.example /counterwallet/counterwallet.conf.json
 RUN rm -f /root/.transifex
 

@@ -2,8 +2,8 @@
 <html lang="en-us" style="background-color:#FFF">
   <head>
     <meta charset="utf-8">
-    <title>Counterwallet - Free Web Wallet for Bitcoin and Counterparty</title>
-    <meta content="Open-source and client-side web wallet for Counterparty (XCP) and Bitcoin (BTC)" name="description">
+    <title>Counterwallet - Free Web Wallet for Monacoin and Monaparty</title>
+    <meta content="Open-source and client-side web wallet for Monaparty (XMP) and Monacoin (MONA)" name="description">
     <meta content="Counterparty Developers" name="author">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -219,7 +219,7 @@
           </li> -->
           <li data-bind="visible: FEATURE_STATS">
               <a href="pages/stats.html">
-                <i class="fa fa-lg fa-fw fa-crosshairs"></i> <span data-bind="locale: 'network_stats'"></span>
+                <i class="fa fa-lg fa-fw fa-crosshairs"></i> <span class="menu-item-parent" data-bind="locale: 'network_stats'"></span>
               </a>
           </li>
         </ul>
@@ -597,6 +597,7 @@
             <div data-bind="visible: type == 'balancesPage'">
                 <h5 data-bind="locale: 'answers_to_common_questions'"></h5>
                 <ul>
+<!--
                     <li><a href="https://counterpartytalk.org/t/i-logged-in-and-my-address-is-different-and-i-have-no-balance-help/1684" target="_blank" data-bind="locale: 'answer_1'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/how-do-i-participate-in-crowdfunding-of-projects-issued-on-counterparty/1153" target="_blank" data-bind="locale: 'answer_2'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/i-sent-btc-xcp-token-a-while-ago-but-the-transaction-hasnt-gone-through-why/1854" target="_blank" data-bind="locale: 'answer_3'"></a></li>
@@ -605,6 +606,7 @@
                     <li><a href="https://counterpartytalk.org/t/my-address-in-counterwallet-disappeared/1222" target="_blank" data-bind="locale: 'answer_5'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/does-counterwallet-have-two-factor-authentication-2fa/2071" target="_blank" data-bind="locale: 'answer_6'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/about-the-counterwallet-support-category/29" target="_blank" data-bind="locale: 'answer_8'"></a></li>
+-->
                 </ul>
                 <h5 class="margin-bottom-0">
                   <span data-bind="locale: 'for_other_questions'"></span> 
@@ -618,16 +620,20 @@
             <div data-bind="visible: type == 'exchangePage'">
                 <h5 data-bind="locale: 'answers_to_common_questions'"></h5>
                 <ul>
+<!--
                     <li><a href="https://counterpartytalk.org/t/how-to-read-the-combined-asset-token-currency-pairs-such-as-btcxcp-in-dex/2072" target="_blank" data-bind="locale: 'answer_9'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/when-is-a-dex-order-considered-active-and-how-can-i-cancel-it/1180" target="_blank" data-bind="locale: 'answer_11'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/why-do-i-need-small-amounts-of-bitcoin-to-do-things/1142/1" target="_blank" data-bind="locale: 'answer_12'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/what-is-the-difference-between-miners-fee-and-redeemable-fee/1188" target="_blank" data-bind="locale: 'answer_13'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/what-btc-sellers-on-the-counterparty-distributed-exchange-need-to-know/1183" target="_blank" data-bind="locale: 'answer_14'"></a></li>
                     <li><a href="https://counterpartytalk.org/t/about-the-counterwallet-support-category/29" target="_blank" data-bind="locale: 'answer_8'"></a></li>
+-->
                 </ul>
                 <h5 class="margin-bottom-0">
                   <span data-bind="locale: 'for_other_questions'"></span>
+<!--
                   <a href="https://counterpartytalk.org/c/support" target="_blank" data-bind="locale: 'counterparty_forums'"></a>.
+-->
                 </h5>
                 <h5>
                   <span data-bind="locale: 'for_bugs'"></span> 
@@ -676,11 +682,11 @@
                 </div>
                 <div class="col col-sm-4">
                   <div class="btn-group" data-toggle="buttons">
-                    <label class="radioBtn btn btn-lg" data-bind="css: { 'btn-success': donationCurrency() == 'BTC' }">
-                      <input type="radio" name="donationCurrency" value="BTC" data-bind="btnGroupChecked: donationCurrency">BTC
+                    <label class="radioBtn btn btn-lg" data-bind="css: { 'btn-success': donationCurrency() == BTC }, text: BTC">
+                      <input type="radio" name="donationCurrency" data-bind="btnGroupChecked: donationCurrency, attr: { value: BTC}">
                     </label>
-                    <label class="radioBtn btn btn-lg" data-bind="css: { 'btn-success': donationCurrency() == 'XCP' }">
-                      <input type="radio" name="donationCurrency" value="XCP" data-bind="btnGroupChecked: donationCurrency">XCP
+                    <label class="radioBtn btn btn-lg" data-bind="css: { 'btn-success': donationCurrency() == XCP }, text: XCP">
+                      <input type="radio" name="donationCurrency" data-bind="btnGroupChecked: donationCurrency, attr: { value: XCP}">
                     </label>
                   </div>
                 </div>

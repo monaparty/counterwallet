@@ -2,6 +2,63 @@
 
 var bitcore = require('bitcore-lib');
 var bitcoreMessage = require('bitcore-message'); // this also binds itself to bitcore.Message as soon as it's require'd
+bitcoreMessage.MAGIC_BYTES = bitcore.deps.Buffer('Monacoin Signed Message:\n');
+
+var mainnet = { hashGenesisBlock: 'ff9f1c0116d19de7c9963845e129f9ed1bfc0b376eb54fd7afa42e0d418c8bb6',
+  port: 9401,
+  portRpc: 9402,
+  protocol: { magic: 3686187259 },
+  seedsDns: [ 'dnsseed.monacoin.org' ],
+  versions:
+   { bip32: { private: 76066276, public: 76067358 },
+     bip44: 22,
+     private: 176,
+     private_old: 178,
+     public: 50,
+     scripthash: 55,
+     scripthash2: 5 },
+  name: 'livenet',
+  unit: 'MONA',
+  testnet: false,
+  alias: 'mainnet',
+  pubkeyhash: 50,
+  privatekey: 176,
+  privatekey_old: 178,
+  scripthash: 55,
+  xpubkey: 76067358,
+  xprivkey: 76066276,
+  networkMagic: 4223710939,
+  dnsSeeds: [ 'dnsseed.monacoin.org' ] };
+
+var testnet = { hashGenesisBlock: 'a2b106ceba3be0c6d097b2a6a6aacf9d638ba8258ae478158f449c321061e0b2',
+  port: 19403,
+  portRpc: 19402,
+  protocol: { magic: 4056470269 },
+  seedsDns: [ 'testnet-dnsseed.monacoin.org' ],
+  versions:
+   { bip32: { private: 70615956, public: 70617039 },
+     bip44: 1,
+     private: 239,
+     public: 111,
+     scripthash: 117,
+     scripthash2: 196 },
+  name: 'testnet',
+  unit: 'MONA',
+  testnet: true,
+  alias: 'testnet',
+  pubkeyhash: 111,
+  privatekey: 239,
+  scripthash: 117,
+  xpubkey: 70617039,
+  xprivkey: 70615956,
+  networkMagic: 4258449649,
+  dnsSeeds: [ 'testnet-dnsseed.monacoin.org' ] };
+
+bitcore.Networks.remove(bitcore.Networks.testnet);
+bitcore.Networks.mainnet = bitcore.Networks.add(mainnet);
+bitcore.Networks.testnet = bitcore.Networks.add(testnet);
+bitcore.Networks.livenet = bitcore.Networks.mainnet;
+
 
 // this 'global' is overwritten by tests!
 var NETWORK = USE_TESTNET ? bitcore.Networks.testnet : bitcore.Networks.livenet;
@@ -120,7 +177,7 @@ CWPrivateKey.prototype.getAddresses = function() {
 
 CWPrivateKey.prototype.isValid = function() {
   try {
-    return bitcore.Address.isValid(this.getAddress(), NETWORK, bitcore.Address.Pay2PubKeyHash);
+    return bitcore.Address.isValid(this.getAddress(), NETWORK, bitcore.Address.PayToPublicKeyHash);
   } catch (err) {
     return false;
   }
@@ -224,7 +281,7 @@ CWBitcore.isOutScript = function(script) {
 
 CWBitcore.isValidAddress = function(val) {
   try {
-    return bitcore.Address.isValid(val, NETWORK, bitcore.Address.Pay2PubKeyHash);
+    return bitcore.Address.isValid(val, NETWORK, bitcore.Address.PayToPublicKeyHash);
   } catch (err) {
     return false;
   }

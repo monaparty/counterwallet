@@ -38,6 +38,10 @@ NotificationViewModel.calcText = function(category, message) {
   // -- if we need to -- to be able to see what changed, which is important in the case of asset issuances, for instance)
   var desc = "";
 
+  function currency(value) {
+    return i18n.t('<Am>%s</Am> <As>%s</As>', value, KEY_ASSET.XCP);
+  }
+
   if (category == "sends") {
     if (WALLET.getAddressObj(message['source']) && WALLET.getAddressObj(message['destination'])) {
       desc = i18n.t("notif_you_transferred", smartFormat(normalizeQuantity(message['quantity'], message['_asset_divisible'])),
@@ -53,7 +57,7 @@ NotificationViewModel.calcText = function(category, message) {
     desc = i18n.t("notif_btcpay_from", getAddressLabel(message['source']), getAddressLabel(message['destination']),
       smartFormat(normalizeQuantity(message['btc_amount'])));
   } else if (category == "burns" && WALLET.getAddressObj(message['source'])) {
-    desc = i18n.t("notif_burn", getAddressLabel(message['source']), smartFormat(normalizeQuantity(message['burned'])),
+    desc = i18n.t("notif_burn", getAddressLabel(message['source']), KEY_ASSET.BTC, currency(smartFormat(normalizeQuantity(message['burned']))),
       smartFormat(normalizeQuantity(message['earned'])));
   } else if (category == "cancels" && WALLET.getAddressObj(message['source'])) {
     desc = i18n.t("notif_order_cancelled", message['tx_index'], getAddressLabel(message['source']));
@@ -122,13 +126,13 @@ NotificationViewModel.calcText = function(category, message) {
     }
   } else if (category == "bets" && WALLET.getAddressObj(message['source'])) {
 
-    desc = i18n.t("notif_bet", smartFormat(normalizeQuantity(message['wager_quantity'])), getAddressLabel(message['source']));
+    desc = i18n.t("notif_bet", currency(smartFormat(normalizeQuantity(message['wager_quantity']))), getAddressLabel(message['source']));
 
   } else if (category == "bet_matches" && (WALLET.getAddressObj(message['tx0_address']) || WALLET.getAddressObj(message['tx1_address']))) {
 
     desc = i18n.t("notif_bet_matched", message['feed_address'], getAddressLabel(message['tx0_address']),
-      smartFormat(normalizeQuantity(message['forward_quantity'])), getAddressLabel(message['tx1_address']),
-      smartFormat(normalizeQuantity(message['backward_quantity'])));
+      currency(smartFormat(normalizeQuantity(message['forward_quantity']))), getAddressLabel(message['tx1_address']),
+      currency(smartFormat(normalizeQuantity(message['backward_quantity']))));
 
   } else if (category == "bet_expirations" && WALLET.getAddressObj(message['source'])) {
     desc = i18n.t("notif_bet_expired", message['bet_index'], getAddressLabel(message['source']));
@@ -184,6 +188,7 @@ function NotificationFeedViewModel(initialCount) {
     //noty({type: 'success', text: noto.MESSAGE_TEXT, timeout: 10000});
     $.smallBox({content: noto.MESSAGE_TEXT, timeout: 10000, color: "#fbfbfb", iconSmall : "fa fa-check"});
   }
+
 }
 
 /*NOTE: Any code here is only triggered the first time the page is visited. Put JS that needs to run on the

@@ -287,6 +287,7 @@ module.exports = function(grunt) {
     }
 
     var mergeContent = function(root, block, config) {
+try {
         var combinedcontent = "";
         for (var b in block.src) {
             grunt.log.writeln('preparing file: '+root+'/'+block.src[b]);
@@ -298,6 +299,9 @@ module.exports = function(grunt) {
             combinedcontent += grunt.util.linefeed+'/*----------------'+block.src[b]+'---------------*/'+grunt.util.linefeed+content;
         }
         return combinedcontent;
+} catch (e) {
+  console.error(e);
+}
     }
 
     var minifyApp = function(fileList, config) {

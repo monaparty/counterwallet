@@ -16,6 +16,11 @@ function FeedBrowserViewModel() {
     }
   }
 
+  self.XCP = ko.observable(KEY_ASSET.XCP);
+  self.xcpValue = function(value) {
+    return value + ' ' + KEY_ASSET.XCP;
+  };
+
   self.feed = ko.observable(null);
   self.targetValue = ko.observable(0);
   self.targetValueText = ko.observable('');
@@ -250,7 +255,7 @@ function FeedBrowserViewModel() {
     for (var i = 0; i < addresses.length; i++) {
       options.push({
         address: addresses[i][0],
-        label: addresses[i][1] + ' (' + addresses[i][2] + ' XCP)'
+        label: addresses[i][1] + ' (' + addresses[i][2] + ' ' + KEY_ASSET.XCP + ')'
       });
       self.balances[addresses[i][0]] = addresses[i][2];
     }
@@ -314,8 +319,8 @@ function FeedBrowserViewModel() {
       'expired': i18n.t('expired')
     };
     for (var i in feed.counters.bets) {
-      feed.counters.bets[i].wager_quantity = normalizeQuantity(feed.counters.bets[i].wager_quantity) + ' XCP';
-      feed.counters.bets[i].wager_remaining = normalizeQuantity(feed.counters.bets[i].wager_remaining) + ' XCP';
+      feed.counters.bets[i].wager_quantity = normalizeQuantity(feed.counters.bets[i].wager_quantity) + ' ' + KEY_ASSET.XCP;
+      feed.counters.bets[i].wager_remaining = normalizeQuantity(feed.counters.bets[i].wager_remaining) + ' ' + KEY_ASSET.XCP;
       feed.counters.bets[i].status_html = '<span class="label label-' + classes[feed.counters.bets[i].status] + '">' + feed.counters.bets[i].status + '</span>';
 
     }

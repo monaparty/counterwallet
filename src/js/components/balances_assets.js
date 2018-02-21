@@ -138,7 +138,7 @@ function CreateAssetModalViewModel() {
         if (self.tokenNameType() == 'alphabetic') {
           message += i18n.t("issuance_end_message", getAddressLabel(self.address()), ASSET_CREATION_FEE_XCP);
         } else {
-          message += i18n.t("free_issuance_end_message");
+          message += i18n.t("free_issuance_end_message", KEY_ASSET.XCP);
         }
         WALLET.showTransactionCompleteDialog(message + " " + i18n.t(ACTION_PENDING_NOTICE), message, armoryUTx);
       }
@@ -672,7 +672,7 @@ function PayDividendModalViewModel() {
     }
 
     // fetch shareholders to check transaction dest.
-    if (self.selectedDividendAsset() == 'BTC') {
+    if (self.selectedDividendAsset() === KEY_ASSET.BTC) {
       var params = {
         'filters': [
           {'field': 'asset', 'op': '=', 'value': self.assetData().asset},
@@ -749,7 +749,7 @@ function PayDividendModalViewModel() {
       //Also get the BTC balance at this address and put at head of the list
       WALLET.retrieveBTCBalance(address.ADDRESS, function(balance) {
         if (balance) {
-          self.availableDividendAssets.unshift(new DividendAssetInDropdownItemModel("BTC", "BTC", balance, normalizeQuantity(balance)));
+          self.availableDividendAssets.unshift(new DividendAssetInDropdownItemModel(KEY_ASSET.BTC, KEY_ASSET.BTC, balance, normalizeQuantity(balance)));
         }
       });
     });

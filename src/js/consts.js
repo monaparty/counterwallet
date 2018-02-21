@@ -10,18 +10,18 @@ var MAX_ADDRESSES = 20; //arbitrary (but will generate more on login if they hav
                         //additional addresses from being generated via the GUI)
 
 //Order expiration
-var ORDER_DEFAULT_EXPIRATION = 1000; //num blocks until expiration (at ~9 min per block this is ~6.75 days)
-var ORDER_MAX_EXPIRATION = 3000; //max expiration for order
+var ORDER_DEFAULT_EXPIRATION = 15000; //num blocks until expiration (at ~90 sec per block this is ~6.95 days)
+var ORDER_MAX_EXPIRATION = 45000; //max expiration for order
 
 var STATS_MAX_NUM_TRANSACTIONS = 100; //max # transactions to show in the table
 var VIEW_PRICES_NUM_ASSET_PAIRS = 50; //show market info for this many pairs
-var VIEW_PRICES_ASSET_PAIRS_REFRESH_EVERY = 5 * 60 * 1000; //refresh asset pair market info every 5 minutes
+var VIEW_PRICES_ASSET_PAIRS_REFRESH_EVERY = 60 * 1000; //refresh asset pair market info every 1 minutes
 var VIEW_PRICES_NUM_LATEST_TRADES = 50; //show this many latest trades on the view prices page
-var VIEW_PRICES_LATEST_TRADES_REFRESH_EVERY = 5 * 60 * 1000; //refresh latest trades every 5 minutes
+var VIEW_PRICES_LATEST_TRADES_REFRESH_EVERY = 60 * 1000; //refresh latest trades every 1 minutes
 
-var MARKET_INFO_REFRESH_EVERY = 5 * 60 * 1000; //refresh market info every 5 minutes while enabled (on buy/sell page, and view prices page) 
+var MARKET_INFO_REFRESH_EVERY = 60 * 1000; //refresh market info every 1 minutes while enabled (on buy/sell page, and view prices page) 
 
-var CHAT_NUM_USERS_ONLINE_REFRESH_EVERY = 5 * 60 * 1000; //refresh online user count every 5 minutes while enabled
+var CHAT_NUM_USERS_ONLINE_REFRESH_EVERY = 60 * 1000; //refresh online user count every 1 minutes while enabled
 
 var ALLOW_UNCONFIRMED_INPUTS = true;  // allow use unconfirmed unspents
 
@@ -51,9 +51,9 @@ var SUBASSET_MAX_DISP_LENGTH = 20;
 var IS_MOBILE_OR_TABLET = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 var MAX_INT = Math.pow(2, 63) - 1;
 var UNIT = 100000000; //# satoshis in whole
-var MIN_FEE = 20000; // in satoshis (== .0002 BTC)
-var REGULAR_DUST_SIZE = 5430;
-var MULTISIG_DUST_SIZE = 7800;
+var MIN_FEE = 101000; // in watanabes (== .001 MONA)  #TODO: Should be 100000 not 101000
+var REGULAR_DUST_SIZE = 54600;
+var MULTISIG_DUST_SIZE = 78000;
 var MIN_BALANCE_FOR_ACTION = 50000; //in satoshis ... == .0005
 var ASSET_CREATION_FEE_XCP = 0.5; //in normalized XCP
 var SUBASSET_CREATION_FEE_XCP = 0.25; //in normalized XCP
@@ -181,10 +181,16 @@ var BET_MATCHES_STATUS = {
 
 var LEVERAGE_UNIT = 5040;
 
-var MAINNET_UNSPENDABLE = '1CounterpartyXXXXXXXXXXXXXXXUWLpVr';
-var TESTNET_UNSPENDABLE = 'mvCounterpartyXXXXXXXXXXXXXXW24Hef';
-var TESTNET_BURN_START = 154908;
-var TESTNET_BURN_END = 4017708;
+var MAINNET_UNSPENDABLE = 'MMonapartyMMMMMMMMMMMMMMMMMMMUzGgh';
+var TESTNET_UNSPENDABLE = 'msVB7uMdzAwgQuph5pL8Zb7aiYgjYoFH1q';
+var TESTNET_BURN = {
+  START:  79400,
+  END:  1150000
+};
+var MAINNET_BURN = {
+  START: 1166000,
+  END:   1179440
+};
 
 /***********
  * DYNAMICALLY SET
@@ -223,7 +229,7 @@ var MAX_SUPPORT_CASE_PROBLEM_LEN = 4096;
 var QUOTE_ASSETS = []; // initalized with counterblock is_ready()
 
 var QUICK_BUY_ENABLE = false;
-var BETTING_ENABLE = true;
+var BETTING_ENABLE = false;
 var GAMING_ENABLE = true;
 
 function qs(key) {
@@ -248,6 +254,20 @@ var ROLLBAR_ACCESS_TOKEN = null; //will be set in counterwallet.js
 var TRANSACTION_DELAY = 5000; // delay between transaction to avoid error -22 (vin reused)
 var TRANSACTION_MAX_RETRY = 5; // max retry when transaction failed (don't include first transaction, so 3 retry means 4 queries)
 
-var DONATION_ADDRESS = USE_TESTNET ? 'n4MGGJBkW9RjRKBbZfBAceHDndhywvVPV9' : '19U6MmLLumsqxXSBMB5FgYXbezgXYC6Gpe';
+var DONATION_ADDRESS = USE_TESTNET ? 'n2T96WQMsY9jx8dPzczaEub9BGkpGXXs4C' : 'MUqM2tDnZXtJ4h87W2g8fFz9nW3GsYhMfu';
 
-var APPROX_SECONDS_PER_BLOCK = USE_TESTNET ? 20 * 60 : 8 * 60; //a *rough* estimate on how many seconds per each block (used for estimating open order time left until expiration, etc)
+var APPROX_SECONDS_PER_BLOCK = USE_TESTNET ? 20 * 60 : 60; //a *rough* estimate on how many seconds per each block (used for estimating open order time left until expiration, etc)
+
+var KEY_ASSET = {
+  'BTC': 'MONA',
+  'XCP': 'XMP',
+  'USD': 'USD',
+  'Bitcoin': 'Monacoin',
+  'Counterparty': 'Monaparty'
+};
+
+var KEY_ASSET_WEBSITE = {
+  'BTC': 'https://bitcoin.org/',
+  'XCP': 'https://counterparty.io/'
+};
+

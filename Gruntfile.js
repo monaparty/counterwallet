@@ -30,7 +30,7 @@ module.exports = function (grunt) {
             },
             copy: {
                 files: [
-                    {src: 'src/robots.txt', dest: buildDir+'robots.txt'},
+                    {cwd: 'src', src: 'robots.txt', dest: buildDir+'robots.txt', expand: true},
                     {cwd: 'src/assets/', src: '*', dest: buildDir+'assets/', expand: true}
                 ]
             }

@@ -11,7 +11,7 @@ function AssetViewModel(props) {
   self.DIVISIBLE = props['divisible'] !== undefined ? props['divisible'] : true;
   self.owner = ko.observable(props['owner']);
   self.locked = ko.observable(props['locked'] !== undefined ? props['locked'] : false);
-  self.rawBalance = ko.observable(props['rawBalance'] || (self.ASSET == 'BTC' ? null : 0));
+  self.rawBalance = ko.observable(props['rawBalance'] || (self.ASSET === KEY_ASSET.BTC ? null : 0));
   //^ raw (not normalized) (for BTC/XCP, default to null to show '??' instead of 0, until the balance is populated)
   self.rawSupply = ko.observable(props['rawSupply'] || 0); //raw
   self.SUPPLY = normalizeQuantity(self.rawSupply(), self.DIVISIBLE);
@@ -35,9 +35,25 @@ function AssetViewModel(props) {
     self.escrowedBalance(self.escrowedBalance() + delta);
   }
 
+  self.isBTC = ko.computed(function() {
+    return self.ASSET === KEY_ASSET.BTC;
+  }, self);
+
+  self.XCP = ko.observable(KEY_ASSET.XCP);
+
+  self.isXCP = ko.computed(function() {
+    return self.ASSET === KEY_ASSET.XCP;
+  }, self);
+
   self.isMine = ko.computed(function() {
-    if (self.ASSET == 'BTC' || self.ASSET == 'XCP') return null; //special value for BTC and XCP
+    if (self.isBTC() || self.isXCP()) return null; //special value for BTC and XCP
     return self.owner() == self.ADDRESS;
+  }, self);
+
+  self.isBurnable = ko.computed(function() {
+    var network = USE_TESTNET ? TESTNET_BURN : MAINNET_BURN;
+    var height = WALLET.networkBlockHeight();
+    return self.ASSET === KEY_ASSET.BTC && network.START <= height && height <= network.END;
   }, self);
 
   self.normalizedBalance = ko.computed(function() {

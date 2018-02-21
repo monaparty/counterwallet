@@ -95,12 +95,12 @@ function makeQRCode(addr) {
   return qr.createImgTag(4);
 }
 
-function testnetBurnDetermineEarned(blockHeight, burned) {
+function burnDetermineEarned(burnNetwork, blockHeight, burned) {
   //burned is the quantity of BTC to burn (as a float -- normalized value)
   //XCP quantity returned is as a float -- normalized value
   burned = denormalizeQuantity(burned);
-  var total_time = TESTNET_BURN_END - TESTNET_BURN_START;
-  var partial_time = TESTNET_BURN_END - blockHeight;
+  var total_time = burnNetwork.END - burnNetwork.START;
+  var partial_time = burnNetwork.END - blockHeight;
   var multiplier = 1000 * (1 + .5 * (partial_time / total_time)); //will be approximate
   var earned = Decimal.round(new Decimal(burned).mul(multiplier), 8, Decimal.MidpointRounding.ToEven).toFloat();
   return normalizeQuantity(earned);
