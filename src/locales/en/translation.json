@@ -39,7 +39,7 @@
   "open_wallet": "Open Wallet",
   "login": "Login",
   "login_problems": "Problems logging in?",
-  "counterwallet_desc_1": "Counterwallet-mona is a free web-wallet for Monacoin and <a href=\"https://www.monaparty.me\" target=\"_blank\" rel=\"noopener noreferrer\">Monaparty</a>, based on <a href=\"https://counterparty.io\" target=\"_blank\">Counterparty</a> that the world’s first protocol for decentralized financial tools.",
+  "counterwallet_desc_1": "Counterwallet-mona is a free web-wallet for Monacoin and <a href=\"https://www.monaparty.me\" target=\"_blank\" rel=\"noopener noreferrer\">Monaparty</a>, based on <a href=\"https://counterparty.io\" target=\"_blank\" rel=\"noopener noreferrer\">Counterparty</a> that the world’s first protocol for decentralized financial tools.",
   "counterwallet_desc_2": "All transactions made with Counterwallet use an automatic escrow system to keep them secure, with no middleman required.",
   "counterwallet_desc_3": "Secure",
   "counterwallet_desc_4": "All encryption is handled client-side. Neither your passphrase nor any of your private information ever leaves your browser.",
@@ -150,7 +150,7 @@
 
   "create_support_case": "Create Support Case",
   "create_support_case_desc1": "Create a support case by filling out the information below.",
-  "create_support_case_desc2": "<b>Please only create a case for bugs only.<br/>For questions, check out <a href=\"http://support.counterparty.io/\" target=\"_blank\" rel=\"noopener noreferrer\">our knowledge base</a> or ask in <a href=\"https://forums.counterparty.io/c/support\" target=\"_blank\">our forums</a>.</b>",
+  "create_support_case_desc2": "<b>Please only create a case for bugs only.<br/>For questions, check out <a href=\"http://support.counterparty.io/\" target=\"_blank\" rel=\"noopener noreferrer\">our knowledge base</a> or ask in <a href=\"https://forums.counterparty.io/c/support\" target=\"_blank\" rel=\"noopener noreferrer\">our forums</a>.</b>",
   "your_name": "Your Name",
   "your_email": "Your Email Address",
   "required_support": "Required so that we can provide a response to you.",
