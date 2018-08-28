@@ -160,6 +160,7 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
         asset: asset,
         asset_longname: assetInfo['asset_longname'],
         divisible: assetInfo['divisible'],
+        listed: assetInfo['listed'],
         owner: assetInfo['owner'] || assetInfo['issuer'],
         locked: assetInfo['locked'],
         rawBalance: initialRawBalance,

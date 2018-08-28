@@ -58,6 +58,7 @@ function CreateAssetModalViewModel() {
     required: false
   });
   self.divisible = ko.observable(true);
+  self.listed = ko.observable(true);
   self.quantity = ko.observable().extend({
     required: true,
     isValidPositiveQuantityOrZero: self,
@@ -169,6 +170,7 @@ function CreateAssetModalViewModel() {
       asset: name,
       quantity: rawQuantity,
       divisible: self.divisible(),
+      listed: self.listed(),
       description: self.description(),
       transfer_destination: null,
       _fee_option: 'custom',
@@ -276,6 +278,7 @@ function IssueAdditionalAssetModalViewModel() {
         quantity: self.rawAdditionalIssue(),
         asset: self.asset().ASSET,
         divisible: self.asset().DIVISIBLE,
+        listed: self.asset().LISTED,
         description: self.asset().description(),
         transfer_destination: null,
         _fee_option: 'custom',
@@ -363,6 +366,7 @@ function TransferAssetModalViewModel() {
         quantity: 0,
         asset: self.asset().ASSET,
         divisible: self.asset().DIVISIBLE,
+        listed: self.asset().LISTED,
         description: self.asset().description(),
         transfer_destination: self.destAddress(),
         _fee_option: 'custom',
@@ -458,6 +462,7 @@ function ChangeAssetDescriptionModalViewModel() {
       quantity: 0,
       asset: self.asset().ASSET,
       divisible: self.asset().DIVISIBLE,
+      listed: self.asset().LISTED,
       description: self.newDescription(),
       transfer_destination: null,
       _fee_option: 'custom',
@@ -815,6 +820,7 @@ function ShowAssetInfoModalViewModel() {
   self.totalIssued = ko.observable(null);
   self.locked = ko.observable(null);
   self.divisible = ko.observable(null);
+  self.listed = ko.observable(null);
   self.history = ko.observableArray([]);
 
   self.extImageURL = ko.observable(null);
@@ -839,6 +845,7 @@ function ShowAssetInfoModalViewModel() {
     self.totalIssued(assetObj.normalizedTotalIssued());
     self.locked(assetObj.locked());
     self.divisible(assetObj.DIVISIBLE);
+    self.listed(assetObj.LISTED);
     self.history([]); //clear until we have the data from the API call below...
 
     //Fetch the asset history and populate the table with it
