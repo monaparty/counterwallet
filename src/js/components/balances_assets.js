@@ -105,6 +105,7 @@ function CreateAssetModalViewModel() {
     self.name('');
     self.description('');
     self.divisible(true);
+    self.listed(true);
     self.quantity(null);
     self.validationModel.errors.showAllMessages(false);
     self.feeController.reset();
@@ -181,7 +182,7 @@ function CreateAssetModalViewModel() {
   // mix in shared fee calculation functions
   self.feeController = CWFeeModelMixin(self, {
     action: "create_issuance",
-    transactionParameters: [self.tokenNameType, self.name, self.description, self.divisible, self.quantity],
+    transactionParameters: [self.tokenNameType, self.name, self.description, self.divisible, self.listed, self.quantity],
     validTransactionCheck: function() {
       return self.validationModel.isValid();
     },
