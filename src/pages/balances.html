@@ -745,6 +745,15 @@
               </label>
               <div class="note" data-bind="locale: 'make_listed_note'"></div>
           </div></section>
+          <section><div class="row">
+            <div class="col col-sm-3"></div>
+            <div class="col col-sm-9">
+              <label class="checkbox">
+                <input name="assetReassignable" type="checkbox" data-bind="checked: reassignable">
+                <i></i><span data-bind="locale: 'make_reassignable'"></span>
+              </label>
+              <div class="note" data-bind="locale: 'make_reassignable_note'"></div>
+          </div></section>
 
           <section><!-- fee section -->
             <div class="row">
@@ -1108,6 +1117,15 @@
                 <i></i><span data-bind="locale: 'listed_token'"></span>
               </label>
               <div class="note" data-bind="locale: 'listed_token_note'"></div>
+          </div></section>
+          <section><div class="row">
+            <div class="col col-sm-2"></div>
+            <div class="col col-sm-10">
+              <label class="checkbox">
+                <input name="assetReassignable" type="checkbox" data-bind="checked: reassignable" disabled="disabled">
+                <i></i><span data-bind="locale: 'reassignable_token'"></span>
+              </label>
+              <div class="note" data-bind="locale: 'reassignable_token_note'"></div>
           </div></section>
         </fieldset></form>
         <table class="table table-striped table-bordered table-hover" data-bind="fadeVisibleInOnly: showHistory">
