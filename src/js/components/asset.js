@@ -166,6 +166,8 @@ function AssetViewModel(props) {
                 quantity: 0,
                 asset: self.ASSET,
                 divisible: self.DIVISIBLE,
+                listed: self.LISTED,
+                reassignable: self.REASSIGNABLE,
                 description: 'LOCK',
                 transfer_destination: null
               },
