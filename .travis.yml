@@ -41,7 +41,7 @@ install:
 
 script:
 # run the test suite in the docker container we just made
-- docker run --entrypoint=/bin/bash counterparty/counterwallet:$DOCKER_TAG -c "cd /counterwallet; mocha-phantomjs test/test.html --ignore-ssl-errors=true --ignore-resource-errors --ssl-protocol=any"
+- docker run --entrypoint=/bin/bash counterparty/counterwallet:$DOCKER_TAG -c 'cd /counterwallet; mocha-phantomjs test/test.html --ignore-ssl-errors=true --ignore-resource-errors --ssl-protocol=any'
 
 after_success:
 # if it's master or develop, then push the appropirately tagged docker image (otherwise don't push anything)
