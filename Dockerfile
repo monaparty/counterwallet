@@ -89,9 +89,9 @@ RUN cd src; bower --allow-root --config.interactive=false update; cd ..
 RUN cd src/vendors/bitcoinjs-lib; npm install; browserify --standalone bitcoinjs src/index.js | uglifyjs -c --mangle reserved=['BigInteger','ECPair','Point'] -o bitcoinjs.min.js; cd ../../../
 RUN npm install
 RUN npm update
-RUN grunt build --dontcheckdeps --dontminify
+RUN grunt build --dontcheckdeps --dontminify --force
 # We gotta grunt build 2 times, bitcoinjs-lib gets mangled horribly if not --dontminify above
-RUN grunt build
+RUN grunt build --force
 RUN rm -f /root/.transifex
 
 EXPOSE 80 443
