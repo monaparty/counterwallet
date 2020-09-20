@@ -9,23 +9,32 @@
     "type": "git",
     "url": "https://github.com/monaparty/counterwallet.git"
   },
+  "dependencies": {
+    "cryptojs": "2.5.3",
+    "mocha": "1.18.2",
+    "transifex": "^1.5.0"
+  },
   "devDependencies": {
     "bower": "^1.8.2",
     "chai": "=1.9.1",
     "clean-css": "2.1.8",
-    "cryptojs": "2.5.3",
-    "grunt": "^1.0.1",
+    "express": "^4.17.1",
+    "express-http-proxy": "^1.5.1",
+    "grunt": "^0.4.1",
     "grunt-chrome-compile": "0.2.2",
     "grunt-contrib-copy": "0.4.x",
     "grunt-usemin": "2.1.x",
-    "mocha": "1.18.2",
-    "mocha-phantomjs": "^4.1.0",
-    "transifex": "1.4.2",
+    "mocha-phantomjs": "4.x",
+    "serve": "^6.5.3",
     "uglify-js": "1.3.5"
   },
   "scripts": {
     "bower": "cd src && bower",
     "prepublish": "grunt",
+    "serve": "serve -p 3000 ./build",
+    "build": "grunt build --dontcheckdeps && cd ./src && bower --allow-root --config.interactive=false update",
+    "dev": "grunt build --dontcheckdeps --dontminify",
+    "q": "grunt build --dontcheckdeps",
     "test": "./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/test.html --ignore-ssl-errors=true --ignore-resource-errors --ssl-protocol=any # phantomjs has issues with counterwallet.io SSL cert"
   },
   "engine": "node >= 0.10"

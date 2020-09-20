@@ -12,6 +12,7 @@ function WalletViewModel() {
   self.isExplicitlyNew = ko.observable(false); //set to true if the user explicitly clicks on Create New Wallet and makes it (e.g. this may be false and isNew true if the user typed in the wrong passphrase, or manually put the words together)
   self.isSellingBTC = ko.observable(false); //updated by the btcpay feed
   self.isOldWallet = ko.observable(false);
+  self.isSegwitEnabled = USE_TESTNET || USE_REGTEST;
 
   self.cancelOrders = [];
   var storedCancelOrders = localStorage.getObject("cancelOrders")
@@ -19,7 +20,19 @@ function WalletViewModel() {
     self.cancelOrders = storedCancelOrders;
   }
 
+  function updateSegwitGenerationVisibility() {
+    if (self.isSegwitEnabled) {
+      $("#createSegwitAddress").show()
+    } else {
+      $("#createSegwitAddress").hide()
+    }
+  }
+
   self.networkBlockHeight.subscribe(function(newBlockIndex) {
+    self.isSegwitEnabled = newBlockIndex >= 557236 // should be synced up to "segwit_support" entry from counterparty-lib/counterpartylib/protocol_changes.json
+
+    updateSegwitGenerationVisibility()
+
     try {
       if (CURRENT_PAGE_URL == 'pages/exchange.html') {
         EXCHANGE.refresh();
@@ -28,8 +41,8 @@ function WalletViewModel() {
   });
 
   self.addAddress = function(type, address, pubKeys) {
-    assert(['normal', 'watch', 'armory', 'multisig'].indexOf(type) != -1);
-    assert((type == 'normal' && !address) || (address));
+    assert(['normal', 'watch', 'armory', 'multisig', 'segwit'].indexOf(type) != -1);
+    assert(((type == 'normal' || type == 'segwit') && !address) || (address));
     assert((type == 'multisig' && pubKeys) || (type == 'armory' && pubKeys) || !pubKeys); //only used with armory addresses
 
     if (type == 'normal') {
@@ -55,6 +68,37 @@ function WalletViewModel() {
       self.addresses.push(new AddressViewModel(type, key, address, label)); //add new
       $.jqlog.debug("Wallet address added: " + address + " -- hash: "
         + addressHash + " -- label: " + label + " -- index: " + i);
+    } else if (type == 'segwit') {
+      //adds a key to the wallet, making a new address object on the wallet in the process
+      //(assets must still be attached to this address, with updateBalances() or other means...)
+      //also, a label should already exist for the address in PREFERENCES.address_aliases by the time this is called
+
+      //derive an address from the key (for the appropriate network)
+      if (self.isSegwitEnabled) {
+        var i = self.addresses().length;
+
+        // m : masterkery / 0' : first private derivation / 0 : external account / i : index
+        var key = self.BITCOIN_WALLET.getAddressKey(i);
+        var networkName = key.priv.network.alias
+        if (USE_TESTNET && ! USE_REGTEST) {
+          networkName = key.priv.network.name
+        }
+        var address = bitcoinjs.payments.p2wpkh({ pubkey: key.priv.publicKey.toBuffer(), network: bitcoinjs.networks[networkName] }).address;
+
+        //Make sure this address doesn't already exist in the wallet (sanity check)
+        assert(!self.getAddressObj(address), "Cannot addAddress: address already exists in wallet!");
+        //see if there's a label already for this address that's stored in PREFERENCES, and use that if so
+        var addressHash = hashToB64(address);
+        //^ we store in prefs by a hash of the address so that the server data (if compromised) cannot reveal address associations
+        var label = PREFERENCES.address_aliases[addressHash] || i18n.t("default_address_label", (i + 1));
+        //^ an alias is made when a watch address is made, so this should always be found
+
+        self.addresses.push(new AddressViewModel(type, key, address, label)); //add new
+        $.jqlog.debug("Wallet address added: " + address + " -- hash: "
+          + addressHash + " -- label: " + label + " -- index: " + i);
+      } else {
+        $.jqlog.debug("Segwit not enabled on mainnet yet");
+      }
     } else {
       //adds a watch only address to the wallet
       //a label should already exist for the address in PREFERENCES.address_aliases by the time this is called
@@ -165,6 +209,40 @@ function WalletViewModel() {
 
     }
     return true;
+  }
+
+  self.updateDispensers = function (address) {
+    var addressObj = self.getAddressObj(address);
+    assert(addressObj);
+    failoverAPI("get_dispensers", {
+      "filters": [
+        {
+          "field": "source",
+          "op": "=",
+          "value": address
+        },
+        {
+          "field": "status",
+          "op": "=",
+          "value": "0"
+        }
+      ]
+    }, function(dispensers, endpoint) {
+      for (var i=0; i < dispensers.length; i++) {
+        self.addOrUpdateDispenser(addressObj, dispensers[i])
+      }
+    });
+  }
+
+  self.addOrUpdateDispenser = function(addressObj, dispenser) {
+    var assetObj = addressObj.getAssetObj(dispenser.asset);
+    if (!assetObj) {
+      failoverAPI("get_assets_info", {'assetsList': [dispenser.asset]}, function(assetsInfo, endpoint) {
+        addressObj.addOrUpdateDispenser(dispenser, assetsInfo[0]);
+      });
+    } else {
+      addressObj.addOrUpdateDispenser(dispenser, assetObj)
+    }
   }
 
   self.getAddressesWithAsset = function(asset) {
@@ -295,6 +373,7 @@ function WalletViewModel() {
     //update all counterparty asset balances for the specified address (including XCP)
     //Note: after login, this normally never needs to be called (except when adding a watch address),
     // as counterparty asset balances are updated automatically via the messages feed
+    $.jqlog.debug('Updating normalized balances for a multiple addresses at wallet ' + addresses)
     failoverAPI("get_normalized_balances", {'addresses': addresses},
       function(balancesData, endpoint) {
         $.jqlog.debug("Got initial balances: " + JSON.stringify(balancesData));
@@ -393,6 +472,7 @@ function WalletViewModel() {
         // some/most of it back as change. To avoid people being confused over this, with BTC in particular, we should
         // display the unconfirmed portion of the balance in addition to the confirmed balance, as it will include the change output
         self.updateBalance(data[i]['addr'], KEY_ASSET.BTC, data[i]['confirmedRawBal'], data[i]['unconfirmedRawBal']);
+        self.updateDispensers(data[i]['addr'])
 
         addressObj = self.getAddressObj(data[i]['addr']);
         assert(addressObj, 'Cannot find address in wallet for refreshing ' + KEY_ASSET.BTC + ' balances!');
@@ -484,23 +564,111 @@ function WalletViewModel() {
     );
   }
 
+  function isBech32(addr) {
+    try {
+      bitcoinjs.address.fromBech32(addr)
+
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   self.signAndBroadcastTxRaw = function(key, unsignedTxHex, onSuccess, onError, verifySourceAddr, verifyDestAddr) {
     assert(verifySourceAddr, "Source address must be specified");
     assert(verifyDestAddr, "Destination address must be specified");
     //Sign and broadcast a multisig transaction that we got back from counterpartyd (as a raw unsigned tx in hex)
-    //* verifySourceAddr and verifyDestAddr MUST be specified to verify that the txn hash we get back from the server is what we expected. 
+    // verifySourceAddr and verifyDestAddr MUST be specified to verify that the txn hash we get back from the server is what we expected.
 
     $.jqlog.debug("RAW UNSIGNED HEX: " + unsignedTxHex);
 
-    //Sign the input(s)
-    key.checkAndSignRawTransaction(unsignedTxHex, verifyDestAddr, function(err, signedHex) {
-      if (err) {
-        bootbox.alert("Failed to sign transaction: " + err);
-        return 
-      }
+    var sourceIsBech32 = isBech32(verifySourceAddr);
+    var hasDestBech32 = verifyDestAddr.reduce((p, x) => p || isBech32(x), false);
+    var hasAnyBech32 = hasDestBech32 || sourceIsBech32;
 
-      self.broadcastSignedTx(signedHex, onSuccess, onError);
-    });
+    if (hasAnyBech32) {
+      // Use bitcoinjs implementation
+      var tx = bitcoinjs.Transaction.fromHex(unsignedTxHex);
+      var network = bitcoinjs.networks[self.BITCOIN_WALLET.HierarchicalKey.network.alias];
+
+      var txb = new bitcoinjs.TransactionBuilder(network);
+      var keypair = bitcoinjs.ECPair.fromWIF(key.priv.toWIF(), network); // Way easier to convert to WIF and then back to ECPair
+
+      self.retrieveBTCAddrsInfo([verifySourceAddr], function(data) {
+        var utxoMap = {}
+        data[0].rawUtxoData.forEach(utxo => {
+          utxoMap[utxo.txid] = utxo
+        })
+
+        if (sourceIsBech32) {
+          var p2wpkh = bitcoinjs.payments.p2wpkh({ pubkey: keypair.publicKey, network: network })
+
+          for (var i=0; i < tx.ins.length; i++) {
+             // We get reversed tx hashes somehow after parsing
+            var txhash = tx.ins[i].hash.reverse().toString('hex')
+            var prev = utxoMap[txhash]
+
+            txb.addInput(tx.ins[i].hash.toString('hex'), prev.vout, null, p2wpkh.output)
+          }
+        } else {
+          var p2pk = bitcoinjs.payments.p2pkh({ pubkey: keypair.publicKey, network: network })
+
+          for (var i=0; i < tx.ins.length; i++) {
+             // We get reversed tx hashes somehow after parsing
+            var txhash = tx.ins[i].hash.reverse().toString('hex')
+            var prev = utxoMap[txhash]
+
+            txb.addInput(tx.ins[i].hash.toString('hex'), prev.vout, null, p2pk.output)
+          }
+        }
+
+        for (var i=0; i < tx.outs.length; i++) {
+          var txout = tx.outs[i]
+
+          txb.addOutput(txout.script, txout.value)
+        }
+
+        for (var i=0; i < tx.ins.length; i++) {
+          var txhash = tx.ins[i].hash.toString('hex')
+          if (txhash in utxoMap) {
+            var prev = utxoMap[txhash]
+            var redeemScript = undefined
+            /*if (hasDestBech32) {
+              redeemScript =  // Future support for P2WSH
+            }*/
+            // Math.floor is less than ideal in this scenario, we need to get the raw satoshi value in the utxo map
+            txb.sign(i, keypair, null, null, Math.floor(parseFloat(prev.amount) * 100000000), redeemScript);
+          } else {
+            // This should throw an error?
+            bootbox.alert("Failed to sign transaction: " + "Incomplete SegWit inputs");
+            return
+          }
+        }
+
+        var signedHex = txb.build().toHex();
+
+        $.jqlog.debug("RAW SIGNED HEX: " + signedHex);
+
+        self.broadcastSignedTx(signedHex, onSuccess, onError);
+      }, function(jqXHR, textStatus, errorThrown) {
+        if (err) {
+          bootbox.alert("Failed to sign transaction: " + textStatus);
+          return
+        }
+      });
+
+    } else {
+      // Use legacy bitcore implementation
+      //Sign the input(s)
+      key.checkAndSignRawTransaction(unsignedTxHex, verifyDestAddr, function(err, signedHex) {
+        if (err) {
+          bootbox.alert("Failed to sign transaction: " + err);
+          return
+        }
+
+        self.broadcastSignedTx(signedHex, onSuccess, onError);
+      });
+    }
   }
 
   self.signAndBroadcastTx = function(address, unsignedTxHex, onSuccess, onError, verifyDestAddr) {

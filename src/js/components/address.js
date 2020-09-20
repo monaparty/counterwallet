@@ -1,8 +1,8 @@
 function AddressViewModel(type, key, address, initialLabel, pubKeys) {
   //An address on a wallet
   //type is one of: normal, watch, armory
-  assert(['normal', 'watch', 'armory', 'multisig'].indexOf(type) != -1);
-  assert((type == 'normal' && key) || (type == 'watch' && !key) || (type == 'armory' && !key) || type == 'multisig');
+  assert(['normal', 'watch', 'armory', 'multisig', 'segwit'].indexOf(type) != -1);
+  assert(((type == 'normal' || type == 'segwit') && key) || (type == 'watch' && !key) || (type == 'armory' && !key) || type == 'multisig');
   assert((type == 'multisig' && pubKeys) || (type == 'armory' && pubKeys) || !pubKeys); //only used with armory addresses
 
   var self = this;
@@ -15,6 +15,7 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
   //Accessors for ease of use in templates...
   self.FEATURE_DIVIDEND = disabledFeatures.indexOf('dividend') == -1;
   self.IS_NORMAL = (type == 'normal');
+  self.IS_SEGWIT = (type == 'segwit');
   self.IS_WATCH_ONLY = (type == 'watch');
   self.IS_ARMORY_OFFLINE = (type == 'armory');
   self.IS_MULTISIG_ADDRESS = (type == 'multisig');
@@ -32,6 +33,8 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
     new AssetViewModel({address: address, asset: KEY_ASSET.BTC}), //will be updated with data loaded from insight
     new AssetViewModel({address: address, asset: KEY_ASSET.XCP})  //will be updated with data loaded from counterpartyd
   ]);
+
+  self.dispensers = ko.observableArray([]);
 
   self.assetFilter = ko.observable('');
   self.filteredAssets = ko.computed(function() {
@@ -52,6 +55,10 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
       });
     }
   }, self);
+
+  self.hasDispensers = ko.computed(function() {
+    return self.dispensers().length > 0
+  });
 
   self.multisigType = ko.computed(function() {
     if (!self.IS_MULTISIG_ADDRESS) return null;
@@ -106,6 +113,28 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
 
       $('#asset-' + self.ADDRESS + '-' + asset + ' .assetBtn').unbind('click');
       $('#asset-' + self.ADDRESS + '-' + asset + ' .assetBtn').click(function(event) {
+        var menu = $(this).parent().find('ul');
+        if (menu.css('display') == 'block') {
+          menu.hide();
+        } else {
+          menu.show();
+        }
+        menu.mouseleave(function() {
+          menu.hide();
+          menu.unbind('mouseleave');
+        })
+      });
+
+    }, 500);
+  }
+
+  self.initDispenserDropDown = function(asset) {
+    setTimeout(function() {
+
+      $('#dispenser-' + self.ADDRESS + '-' + asset + ' .dropdown-toggle').last().dropdown();
+
+      $('#dispenser-' + self.ADDRESS + '-' + asset + ' .assetBtn').unbind('click');
+      $('#dispenser-' + self.ADDRESS + '-' + asset + ' .assetBtn').click(function(event) {
         var menu = $(this).parent().find('ul');
         if (menu.css('display') == 'block') {
           menu.hide();
@@ -213,6 +242,38 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
     }
   }
 
+  self.addOrUpdateDispenser = function(dispenser, assetInfo) {
+    var match = ko.utils.arrayFirst(self.dispensers(), function(item) {
+      return item.ASSET === dispenser.asset
+    });
+
+    if (!match) {
+      var dispenserProps = {
+        address: self.ADDRESS,
+        asset: dispenser.asset,
+        asset_longname: assetInfo['asset_longname'],
+        divisible: assetInfo['divisible'],
+        //owner: assetInfo['owner'] || assetInfo['issuer'],
+        //locked: assetInfo['locked'],
+        description: assetInfo['description'],
+        rawEscrowedBalance: dispenser.escrow_quantity,
+        escrowedBalance: normalizeQuantity(dispenser.escrow_quantity, assetInfo['divisible']),
+        rawGiveRemaining: dispenser.give_remaining,
+        giveRemaining: normalizeQuantity(dispenser.give_remaining, assetInfo['divisible']),
+        rawGiveQuantity: dispenser.give_quantity,
+        giveQuantity: normalizeQuantity(dispenser.give_quantity, assetInfo['divisible']),
+        rawSatoshirate: dispenser.satoshirate,
+        satoshirate: normalizeQuantity(dispenser.satoshirate, true),
+      }
+
+      self.dispensers.push(new DispenserViewModel(dispenserProps));
+      //self.initDispenserDropDown(dispenser.asset);
+      // TODO: Add dropdowns and tooltips
+    } else {
+
+    }
+  }
+
   self.removeAsset = function(asset) {
     self.assets.remove(function(item) {
       return item.ASSET == asset;
@@ -251,6 +312,8 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
         function(el) { return el.address !== self.ADDRESS; });
     } else if (self.TYPE === 'normal') {
       PREFERENCES['num_addresses_used'] -= 1;
+    } else if (self.TYPE === 'segwit') {
+      PREFERENCES['num_segwit_addresses_used'] -= 1;
     }
 
     WALLET.storePreferences(function() {

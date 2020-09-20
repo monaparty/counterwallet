@@ -1,7 +1,7 @@
 /***********
  * GLOBAL CONSTANTS
  ***********/
-var VERSION = "1.8.0";
+var VERSION = "1.9.0";
 var PREFERENCES = {}; //set when logging in
 
 //Addresses
@@ -32,6 +32,7 @@ var ARMORY_OFFLINE_TX_PREFIX = "=====TXSIGCOLLECT-";
 
 var DEFAULT_PREFERENCES = {
   'num_addresses_used': DEFAULT_NUM_ADDRESSES,
+  'num_segwit_addresses_used': DEFAULT_NUM_ADDRESSES,
   'address_aliases': {},
   'selected_theme': 'ultraLight',
   'selected_lang': 'en-us',
@@ -213,13 +214,7 @@ var DISABLED_FEATURES_SUPPORTED = ['betting', 'dividend', 'exchange', 'leaderboa
 var DISABLED_FEATURES = []; //set in counterwallet.js
 
 // restricted action
-var RESTRICTED_AREA = {
-  'pages/betting.html': ['US'],
-  'pages/openbets.html': ['US'],
-  'pages/matchedbets.html': ['US'],
-  'dividend': ['US'],
-  'pages/simplebuy.html': ['US']
-}
+var RESTRICTED_AREA = {} // set in counterwallet.js
 
 var RESTRICTED_AREA_MESSAGE = {
   'pages/simplebuy.html': 'buy_xcp_if_legal'
@@ -243,6 +238,7 @@ function qs(key) {
 // IS_DEV is enabled if the initial (root) URL access has ?dev=1
 // USE_TESTNET is enabled if the initial (root) URL access has ?testnet=1, OR the hostname visited starts with 'testnet' (e.g. testnet.myhost.com)
 var IS_DEV = (location.pathname == "/" && qs("dev") && qs("dev") != '0' ? true : false);
+var USE_REGTEST = (location.pathname == "/" && qs("regtest") && qs("regtest") != '0' ? true : false);
 var USE_TESTNET = (   (((location.pathname == "/" || location.pathname == "/src/" || location.pathname == "/build/") && qs("testnet") && qs("testnet") != '0')
   || location.hostname.indexOf('testnet') != -1) ? true : false
 );
@@ -271,3 +267,16 @@ var KEY_ASSET_WEBSITE = {
   'XCP': 'https://counterparty.io/'
 };
 
+bitcoinjs.networks.regtest = {
+    messagePrefix: '\x18Bitcoin Signed Message:\n',
+    bech32: 'bcrt',
+    bip32: {
+      public: 0x043587cf,
+      private: 0x04358394
+    },
+    pubKeyHash: 0x6f,
+    scriptHash: 0xc4,
+    wif: 0xef
+  }
+
+bitcoinjs.networks.mainnet = bitcoinjs.networks.bitcoin // support for bitcore's name

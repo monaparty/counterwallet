@@ -61,7 +61,7 @@ bitcore.Networks.livenet = bitcore.Networks.mainnet;
 
 
 // this 'global' is overwritten by tests!
-var NETWORK = USE_TESTNET ? bitcore.Networks.testnet : bitcore.Networks.livenet;
+var NETWORK = (USE_TESTNET || USE_REGTEST) ? bitcore.Networks.testnet : bitcore.Networks.livenet;
 
 var CWHierarchicalKey = function(passphrase, password) {
   checkArgType(passphrase, "string");
@@ -282,6 +282,16 @@ CWBitcore.isOutScript = function(script) {
 CWBitcore.isValidAddress = function(val) {
   try {
     return bitcore.Address.isValid(val, NETWORK, bitcore.Address.PayToPublicKeyHash);
+/* TODO: enable this
+    var p2pkh = bitcore.Address.isValid(val, NETWORK, bitcore.Address.Pay2PubKeyHash);
+    if (!p2pkh) {
+      var bech32 = bitcoinjs.address.fromBech32(val);
+
+      return typeof(bech32) !== 'undefined';
+    }
+
+    return p2pkh;
+*/
   } catch (err) {
     return false;
   }
