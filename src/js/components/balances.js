@@ -50,7 +50,7 @@ function ChangeAddressLabelModalViewModel() {
     var label = _.stripTags($("<div/>").html(self.newLabel()).text());
     //^ remove any HTML tags from the text
     PREFERENCES.address_aliases[addressHash] = label;
-    //^ update the preferences on the server 
+    //^ update the preferences on the server
     WALLET.storePreferences(function(data, endpoint) {
       WALLET.getAddressObj(self.address()).label(label); //update was a success
       self.shown(false);
@@ -286,6 +286,7 @@ function CreateNewAddressModalViewModel() {
 
   self.dispWindowTitle = ko.computed(function() {
     var title = {
+      'segwit': i18n.t('create_segwit_address'),
       'normal': i18n.t('create_new_address'),
       'watch': i18n.t('add_watch_address'),
       'armory': i18n.t('add_armory_adress'),
@@ -335,6 +336,7 @@ function CreateNewAddressModalViewModel() {
   }
 
   self.eventName = {
+    'segwit': 'CreateNewSegwitAddress',
     'normal': 'CreateNewAddress',
     'watch': 'CreateNewWatchAddress',
     'armory': 'CreateNewArmoryOfflineAddress',
@@ -362,6 +364,9 @@ function CreateNewAddressModalViewModel() {
     var newAddressHash = hashToB64(newAddress);
     if (self.addressType() == 'normal') {
       PREFERENCES['num_addresses_used'] = parseInt(PREFERENCES['num_addresses_used']) + 1;
+    } else if (self.addressType() == 'segwit') {
+      if (!(PREFERENCES['num_segwit_addresses_used'] instanceof Array)) PREFERENCES['num_segwit_addresses_used'] = 0;
+      PREFERENCES['num_segwit_addresses_used'] = parseInt(PREFERENCES['num_segwit_addresses_used']) + 1
     } else if (self.addressType() == 'watch') {
       if (!(PREFERENCES['watch_only_addresses'] instanceof Array)) PREFERENCES['watch_only_addresses'] = [];
       PREFERENCES['watch_only_addresses'].push(newAddress); //can't use the hash here, unfortunately
@@ -415,6 +420,24 @@ function SendModalViewModel() {
   self.assetDisp = ko.observable();
   self.rawBalance = ko.observable(null);
   self.divisible = ko.observable();
+  self.feeOption = ko.observable('optimal');
+  self.customFee = ko.observable(null).extend({
+    validation: [{
+      validator: function(val, self) {
+        return self.feeOption() === 'custom' ? val : true;
+      },
+      message: i18n.t('field_required'),
+      params: self
+    }],
+    isValidCustomFeeIfSpecified: self
+  });
+
+  self.feeOption.subscribeChanged(function(newValue, prevValue) {
+    if(newValue !== 'custom') {
+      self.customFee(null);
+      self.customFee.isModified(false);
+    }
+  });
 
   self.destAddress = ko.observable('').extend({
     required: true,
@@ -570,7 +593,7 @@ function SendModalViewModel() {
     var curBalance = normalizeQuantity(self.rawBalance(), self.divisible());
     var balRemaining = Decimal.round(new Decimal(curBalance).sub(parseFloat(self.quantity())), 8, Decimal.MidpointRounding.ToEven).toFloat();
     if (self.asset() === KEY_ASSET.BTC)
-      balRemaining = subFloat(balRemaining, normalizeQuantity(MIN_FEE))  // include the fee 
+      balRemaining = subFloat(balRemaining, normalizeQuantity(MIN_FEE))  // include the fee
     if (balRemaining < 0) return null;
     return balRemaining;
   }, self);
@@ -622,6 +645,7 @@ function SendModalViewModel() {
   self.validationModel = ko.validatedObservable({
     destAddress: self.destAddress,
     quantity: self.quantity,
+    customFee: self.customFee,
     pubkey1: self.pubkey1,
     pubkey2: self.pubkey2,
     pubkey3: self.pubkey3,
@@ -725,6 +749,29 @@ function SendModalViewModel() {
 
   self.show = function(fromAddress, asset, assetDisp, rawBalance, isDivisible, resetForm) {
     if (asset === KEY_ASSET.BTC && rawBalance === null) {
+    /*WALLET.doTransaction(self.address(), "create_send",
+      {
+        source: self.address(),
+        destination: self.destAddress(),
+        quantity: denormalizeQuantity(parseFloat(self.quantity()), self.divisible()),
+        asset: self.asset(),
+        _asset_divisible: self.divisible(),
+        _pubkeys: additionalPubkeys.concat(self._additionalPubkeys),
+        _fee_option: self.feeOption(),
+        _custom_fee: self.customFee()
+      },
+      function(txHash, data, endpoint, addressType, armoryUTx) {
+        var message = "<b>" + (armoryUTx ? i18n.t("will_be_sent") : i18n.t("were_sent")) + " </b>";
+        WALLET.showTransactionCompleteDialog(message + " " + i18n.t(ACTION_PENDING_NOTICE), message, armoryUTx);
+      }
+    );
+    self.shown(false);
+    trackEvent('Balances', 'Send', self.asset());
+  }
+
+  self.show = function(fromAddress, asset, assetDisp, rawBalance, isDivisible, resetForm) {
+    if (asset == 'BTC' && rawBalance == null) {*/
+
       return bootbox.alert(i18n.t("cannot_send_server_unavailable", KEY_ASSET.BTC));
     }
     assert(rawBalance, "Balance is null or undefined?");
@@ -736,6 +783,7 @@ function SendModalViewModel() {
     self.assetDisp(assetDisp);
     self.rawBalance(rawBalance);
     self.divisible(isDivisible);
+    $('#sendFeeOption').select2("val", self.feeOption()); //hack
     self.shown(true);
 
     $('#MemoType').select2("val", self.memoType()); // hack to set select2 value
@@ -774,6 +822,199 @@ var privateKeyValidator = function(required) {
       params: self
     },
     rateLimit: {timeout: 500, method: "notifyWhenChangesStop"}
+  }
+}
+
+function CreateDispenserModalViewModel() {
+  var self = this;
+  self.shown = ko.observable(false);
+  self.address = ko.observable(null); //address string, not an Address object
+  self.asset = ko.observable();
+  self.assetDisp = ko.observable();
+  self.rawBalance = ko.observable(null);
+  self.divisible = ko.observable();
+  self.feeOption = ko.observable('optimal');
+  self.customFee = ko.observable(null).extend({
+    validation: [{
+      validator: function(val, self) {
+        return self.feeOption() === 'custom' ? val : true;
+      },
+      message: i18n.t('field_required'),
+      params: self
+    }],
+    isValidCustomFeeIfSpecified: self
+  });
+
+  self.feeOption.subscribeChanged(function(newValue, prevValue) {
+    if(newValue !== 'custom') {
+      self.customFee(null);
+      self.customFee.isModified(false);
+    }
+  });
+
+  self.give_quantity = ko.observable().extend({
+    required: true,
+    isValidPositiveQuantity: self,
+    isValidQtyForDivisibility: self,
+    validation: {
+      validator: function(val, self) {
+        if (normalizeQuantity(self.rawBalance(), self.divisible()) - parseFloat(val) < 0) {
+          return false;
+        }
+        return true;
+      },
+      message: i18n.t('quantity_exceeds_balance'),
+      params: self
+    }
+  });
+
+  self.escrow_quantity = ko.observable().extend({
+    required: true,
+    isValidPositiveQuantity: self,
+    isValidQtyForDivisibility: self,
+    validation: {
+      validator: function(val, self) {
+        if (normalizeQuantity(self.rawBalance(), self.divisible()) - parseFloat(val) < 0) {
+          return false;
+        }
+        return true;
+      },
+      message: i18n.t('quantity_exceeds_balance'),
+      params: self
+    }
+  });
+
+  self.mainchainrate = ko.observable().extend({
+    required: true,
+    isValidPositiveQuantity: self,
+    //isValidQtyForDivisibility: true,
+    validation: {
+      validator: function(val, self) {
+        return true;
+      },
+      message: i18n.t('absurd_quantity'),
+      params: self
+    }
+  });
+
+  self.normalizedBalance = ko.computed(function() {
+    if (self.address() === null || self.rawBalance() === null) return null;
+    return normalizeQuantity(self.rawBalance(), self.divisible());
+  }, self);
+
+  self.dispNormalizedBalance = ko.computed(function() {
+    return smartFormat(self.normalizedBalance(), null, 8);
+  }, self);
+
+  self.normalizedBalRemaining = ko.computed(function() {
+    if (!isNumber(self.escrow_quantity())) return null;
+    var curBalance = normalizeQuantity(self.rawBalance(), self.divisible());
+    var balRemaining = Decimal.round(new Decimal(curBalance).sub(parseFloat(self.escrow_quantity())), 8, Decimal.MidpointRounding.ToEven).toFloat();
+
+    if (balRemaining < 0) return null;
+    return balRemaining;
+  }, self);
+
+  self.dispNormalizedBalRemaining = ko.computed(function() {
+    return smartFormat(self.normalizedBalRemaining(), null, 8);
+  }, self);
+
+  self.normalizedBalRemainingIsSet = ko.computed(function() {
+    return self.normalizedBalRemaining() !== null;
+  }, self);
+
+  self.validationModel = ko.validatedObservable({
+    asset: self.asset,
+    give_quantity: self.give_quantity,
+    escrow_quantity: self.escrow_quantity,
+    mainchainrate: self.mainchainrate,
+    customFee: self.customFee,
+  });
+
+  self.resetForm = function() {
+    self.give_quantity(null);
+    self.escrow_quantity(null);
+    self.mainchainrate(null);
+
+    self.feeController.reset();
+
+    self.validationModel.errors.showAllMessages(false);
+  }
+
+  self.submitForm = function() {
+    if (!self.validationModel.isValid()) {
+      self.validationModel.errors.showAllMessages();
+      return false;
+    }
+    //data entry is valid...submit to the server
+    $('#dispenserModal form').submit();
+  }
+
+  self.maxAmount = function() {
+    assert(self.normalizedBalance(), "No balance present?");
+    self.give_quantity(self.normalizedBalance());
+  }
+
+  self.maxAmountEscrow = function() {
+    assert(self.normalizedBalance(), "No balance present?");
+    self.escrow_quantity(self.normalizedBalance());
+  }
+
+  self.doAction = function() {
+    WALLET.doTransactionWithTxHex(self.address(), "create_dispenser", self.buildDispenserTransactionData(), self.feeController.getUnsignedTx(),
+      function(txHash, data, endpoint, addressType, armoryUTx) {
+        var message = "<b>" + (armoryUTx ? i18n.t("will_be_dispensed") : i18n.t("were_dispensed")) + " </b>";
+        WALLET.showTransactionCompleteDialog(message + " " + i18n.t(ACTION_PENDING_NOTICE), message, armoryUTx);
+      }
+    );
+    self.shown(false);
+    trackEvent('Balances', 'Dispenser', self.asset());
+  }
+
+  self.buildDispenserTransactionData = function() {
+    params = {
+      source: self.address(),
+      asset: self.asset(),
+      give_quantity: denormalizeQuantity(parseFloat(self.give_quantity()), self.divisible()),
+      escrow_quantity: denormalizeQuantity(parseFloat(self.escrow_quantity()), self.divisible()),
+      mainchainrate: denormalizeQuantity(parseFloat(self.mainchainrate()), true),
+      status: 0, // 0 for open, 10 for close
+      _fee_option: 'custom',
+      _custom_fee: self.feeController.getCustomFee()
+    };
+
+    return params
+  }
+
+  // mix in shared fee calculation functions
+  self.feeController = CWFeeModelMixin(self, {
+    action: "create_dispenser",
+    transactionParameters: [],
+    validTransactionCheck: function() {
+      return self.validationModel.isValid();
+    },
+    buildTransactionData: self.buildDispenserTransactionData
+  });
+
+  self.show = function(fromAddress, asset, assetDisp, rawBalance, isDivisible, resetForm) {
+    assert(rawBalance, "Balance is null or undefined?");
+
+    if (typeof(resetForm) === 'undefined') resetForm = true;
+    if (resetForm) self.resetForm();
+    self.address(fromAddress);
+    self.asset(asset);
+    self.assetDisp(assetDisp);
+    self.rawBalance(rawBalance);
+    self.divisible(isDivisible);
+    $('#dispenserFeeOption').select2("val", self.feeOption()); //hack
+    self.shown(true);
+
+    $('#MemoType').select2("val", self.memoType()); // hack to set select2 value
+    trackDialogShow('Send');
+  }
+
+  self.hide = function() {
+    self.shown(false);
   }
 }
 
@@ -898,6 +1139,7 @@ function SweepModalViewModel() {
     if (!address || address == '') return;
 
     //Get the balance of ALL assets at this address
+    $.jqlog.debug('Updating normalized balances for a single address at balances ' + address)
     failoverAPI("get_normalized_balances", {'addresses': [address]}, function(balancesData, endpoint) {
       var assets = [], assetInfo = null;
       for (var i = 0; i < balancesData.length; i++) {
@@ -923,7 +1165,7 @@ function SweepModalViewModel() {
         }
 
         //Also get the BTC balance at this address and put at head of the list
-        //We just check if unconfirmed balance > 0.      
+        //We just check if unconfirmed balance > 0.
         WALLET.retrieveBTCAddrsInfo([address], function(data) {
           self.btcBalanceForPrivateKey(0);
           self.txoutsCountForPrivateKey = 0;
