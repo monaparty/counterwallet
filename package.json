@@ -12,16 +12,17 @@
   "dependencies": {
     "cryptojs": "2.5.3",
     "mocha": "1.18.2",
-    "transifex": "^1.5.0"
+    "transifex": "^1.6.6"
   },
   "devDependencies": {
-    "bower": "^1.8.2",
+    "bower": "^1.8.8",
     "chai": "=1.9.1",
     "clean-css": "2.1.8",
     "express": "^4.17.1",
-    "express-http-proxy": "^1.5.1",
+    "express-http-proxy": "^1.6.2",
     "grunt": "^0.4.1",
     "grunt-chrome-compile": "0.2.2",
+    "grunt-cli": "^0.1.8",
     "grunt-contrib-copy": "0.4.x",
     "grunt-usemin": "2.1.x",
     "mocha-phantomjs": "4.x",
@@ -30,7 +31,6 @@
   },
   "scripts": {
     "bower": "cd src && bower",
-    "prepublish": "grunt",
     "serve": "serve -p 3000 ./build",
     "build": "grunt build --dontcheckdeps && cd ./src && bower --allow-root --config.interactive=false update",
     "dev": "grunt build --dontcheckdeps --dontminify",
