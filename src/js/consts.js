@@ -263,13 +263,13 @@ var KEY_ASSET = {
 };
 
 var KEY_ASSET_WEBSITE = {
-  'BTC': 'https://bitcoin.org/',
-  'XCP': 'https://counterparty.io/'
+  'BTC': 'https://monacoinproject.org/',
+  'XCP': 'https://monaparty.me/'
 };
 
 bitcoinjs.networks.regtest = {
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'bcrt',
+    messagePrefix: '\x19Monacoin Signed Message:\n',
+    bech32: 'rmona',
     bip32: {
       public: 0x043587cf,
       private: 0x04358394
@@ -279,4 +279,26 @@ bitcoinjs.networks.regtest = {
     wif: 0xef
   }
 
-bitcoinjs.networks.mainnet = bitcoinjs.networks.bitcoin // support for bitcore's name
+bitcoinjs.networks.mainnet = {
+    messagePrefix: '\x19Monacoin Signed Message:\n',
+    bech32: 'mona',
+    bip32: {
+      public: 76067358,
+      private: 76066276
+    },
+    pubKeyHash: 50,
+    scriptHash: 55,
+    wif: 176
+  }
+
+bitcoinjs.networks.testnet = {
+    messagePrefix: '\x19Monacoin Signed Message:\n',
+    bech32: 'tmona',
+    bip32: {
+      public: 70617039,
+      private: 70615956
+    },
+    pubKeyHash: 111,
+    scriptHash: 117,
+    wif: 239
+  }
