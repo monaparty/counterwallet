@@ -32,7 +32,7 @@ var ARMORY_OFFLINE_TX_PREFIX = "=====TXSIGCOLLECT-";
 
 var DEFAULT_PREFERENCES = {
   'num_addresses_used': DEFAULT_NUM_ADDRESSES,
-  'num_segwit_addresses_used': DEFAULT_NUM_ADDRESSES,
+  'num_segwit_addresses_used': 0,
   'address_aliases': {},
   'selected_theme': 'ultraLight',
   'selected_lang': 'en-us',
