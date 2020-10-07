@@ -212,7 +212,7 @@ function WalletViewModel() {
   }
 
   self.updateDispensers = function (address) {
-/*    var addressObj = self.getAddressObj(address);
+    var addressObj = self.getAddressObj(address);
     assert(addressObj);
     failoverAPI("get_dispensers", {
       "filters": [
@@ -232,7 +232,6 @@ function WalletViewModel() {
         self.addOrUpdateDispenser(addressObj, dispensers[i])
       }
     });
-*/
   }
 
   self.addOrUpdateDispenser = function(addressObj, dispenser) {
