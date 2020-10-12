@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "bower": "^1.8.8",
+    "browserify": "^17.0.0",
     "chai": "=1.9.1",
     "clean-css": "2.1.8",
     "express": "^4.17.1",
@@ -30,9 +31,11 @@
     "uglify-es": "^3.3.5"
   },
   "scripts": {
-    "bower": "cd src && bower",
+    "bower": "cd src && bower --allow-root --config.interactive=false update",
+    "bitcoinjs-lib": "(cd src/vendors/bitcoinjs-lib && npm install) && browserify --standalone bitcoinjs src/vendors/bitcoinjs-lib/src/index.js | uglifyjs -c --mangle reserved=['BigInteger','ECPair','Point'] -o src/vendors/bitcoinjs-lib/bitcoinjs.min.js",
     "serve": "serve -p 3000 ./build",
-    "build": "grunt build --dontcheckdeps && cd ./src && bower --allow-root --config.interactive=false update",
+    "grunt": "grunt build --dontcheckdeps",
+    "build": "npm run bower && npm run bitcoinjs-lib && npm run grunt",
     "dev": "grunt build --dontcheckdeps --dontminify",
     "q": "grunt build --dontcheckdeps",
     "test": "./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/test.html --ignore-ssl-errors=true --ignore-resource-errors --ssl-protocol=any # phantomjs has issues with counterwallet.io SSL cert"

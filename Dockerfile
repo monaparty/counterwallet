@@ -76,8 +76,6 @@ RUN if [ -n "$TRANSIFEX_USER" ] && [ -n "$TRANSIFEX_PASSWORD" ]; then echo "$TRA
 # Global stuff moved here to speed up build times just for code changes
 RUN npm config set strict-ssl false
 ENV PHANTOMJS_CDNURL="http://cnpmjs.org/downloads"
-RUN npm install -g bower grunt browserify uglify-es
-RUN npm install --unsafe-perm -g mocha-phantomjs
 
 # Install project
 COPY . /counterwallet
@@ -85,13 +83,8 @@ RUN rm -rf /counterwallet/build
 WORKDIR /counterwallet
 RUN git rev-parse HEAD
 
-RUN cd src; bower --allow-root --config.interactive=false update; cd ..
-RUN cd src/vendors/bitcoinjs-lib; npm install; browserify --standalone bitcoinjs src/index.js | uglifyjs -c --mangle reserved=['BigInteger','ECPair','Point'] -o bitcoinjs.min.js; cd ../../../
 RUN npm install
-RUN npm update
-RUN grunt build --dontcheckdeps --dontminify --force
-# We gotta grunt build 2 times, bitcoinjs-lib gets mangled horribly if not --dontminify above
-RUN grunt build --force
+RUN npm run build
 RUN rm -f /root/.transifex
 
 EXPOSE 80 443
