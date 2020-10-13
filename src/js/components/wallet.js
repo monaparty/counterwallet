@@ -637,7 +637,7 @@ function WalletViewModel() {
               redeemScript =  // Future support for P2WSH
             }*/
             // Math.floor is less than ideal in this scenario, we need to get the raw satoshi value in the utxo map
-            txb.sign(i, keypair, null, null, Math.floor(parseFloat(prev.amount) * 100000000), redeemScript);
+            txb.sign(i, keypair, null, null, Math.round(parseFloat(prev.amount) * 100000000), redeemScript);
           } else {
             // This should throw an error?
             bootbox.alert("Failed to sign transaction: " + "Incomplete SegWit inputs");
