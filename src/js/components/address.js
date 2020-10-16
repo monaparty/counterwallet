@@ -191,6 +191,7 @@ function AddressViewModel(type, key, address, initialLabel, pubKeys) {
         divisible: assetInfo['divisible'],
         listed: assetInfo['listed'],
         reassignable: assetInfo['reassignable'],
+        vendable: assetInfo['vendable'],
         owner: assetInfo['owner'] || assetInfo['issuer'],
         locked: assetInfo['locked'],
         rawBalance: initialRawBalance,

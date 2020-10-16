@@ -60,6 +60,7 @@ function CreateAssetModalViewModel() {
   self.divisible = ko.observable(true);
   self.listed = ko.observable(true);
   self.reassignable = ko.observable(true);
+  self.vendable = ko.observable(true);
   self.quantity = ko.observable().extend({
     required: true,
     isValidPositiveQuantityOrZero: self,
@@ -152,6 +153,7 @@ function CreateAssetModalViewModel() {
     self.divisible(true);
     self.listed(true);
     self.reassignable(true);
+    self.vendable(true);
     self.quantity(null);
     self.feeOption('optimal');
     self.customFee(null);
@@ -247,6 +249,7 @@ function CreateAssetModalViewModel() {
       divisible: self.divisible(),
       listed: self.listed(),
       reassignable: self.reassignable(),
+      vendable: self.vendable(),
       description: self.description(),
       transfer_destination: null,
       _fee_option: 'custom',
@@ -257,7 +260,7 @@ function CreateAssetModalViewModel() {
   // mix in shared fee calculation functions
   self.feeController = CWFeeModelMixin(self, {
     action: "create_issuance",
-    transactionParameters: [self.tokenNameType, self.name, self.description, self.divisible, self.listed, self.reassignable, self.quantity],
+    transactionParameters: [self.tokenNameType, self.name, self.description, self.divisible, self.listed, self.reassignable, self.vendable, self.quantity],
     validTransactionCheck: function() {
       return self.validationModel.isValid();
     },
@@ -357,6 +360,7 @@ function IssueAdditionalAssetModalViewModel() {
         divisible: self.asset().DIVISIBLE,
         listed: self.asset().LISTED,
         reassignable: self.asset().REASSIGNABLE,
+        vendable: self.asset().VENDABLE,
         description: self.asset().description(),
         transfer_destination: null,
         _fee_option: 'custom',
@@ -446,6 +450,7 @@ function TransferAssetModalViewModel() {
         divisible: self.asset().DIVISIBLE,
         listed: self.asset().LISTED,
         reassignable: self.asset().REASSIGNABLE,
+        vendable: self.asset().VENDABLE,
         description: self.asset().description(),
         transfer_destination: self.destAddress(),
         _fee_option: 'custom',
@@ -543,6 +548,7 @@ function ChangeAssetDescriptionModalViewModel() {
       divisible: self.asset().DIVISIBLE,
       listed: self.asset().LISTED,
       reassignable: self.asset().REASSIGNABLE,
+      vendable: self.asset().VENDABLE,
       description: self.newDescription(),
       transfer_destination: null,
       _fee_option: 'custom',
@@ -903,6 +909,7 @@ function ShowAssetInfoModalViewModel() {
   self.divisible = ko.observable(null);
   self.listed = ko.observable(null);
   self.reassignable = ko.observable(null);
+  self.vendable = ko.observable(null);
   self.history = ko.observableArray([]);
 
   self.extImageURL = ko.observable(null);
@@ -929,6 +936,7 @@ function ShowAssetInfoModalViewModel() {
     self.divisible(assetObj.DIVISIBLE);
     self.listed(assetObj.LISTED);
     self.reassignable(assetObj.REASSIGNABLE);
+    self.vendable(assetObj.VENDABLE);
     self.history([]); //clear until we have the data from the API call below...
 
     //Fetch the asset history and populate the table with it
