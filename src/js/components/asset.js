@@ -11,6 +11,7 @@ function AssetViewModel(props) {
   self.DIVISIBLE = props['divisible'] !== undefined ? props['divisible'] : true;
   self.LISTED = props['listed'] !== undefined ? props['listed'] : true;
   self.REASSIGNABLE = props['reassignable'] !== undefined ? props['reassignable'] : true;
+  self.VENDABLE = props['vendable'] !== undefined ? props['vendable'] : true;
   self.owner = ko.observable(props['owner']);
   self.locked = ko.observable(props['locked'] !== undefined ? props['locked'] : false);
   self.rawBalance = ko.observable(props['rawBalance'] || (self.ASSET === KEY_ASSET.BTC ? null : 0));
@@ -177,6 +178,7 @@ function AssetViewModel(props) {
                 divisible: self.DIVISIBLE,
                 listed: self.LISTED,
                 reassignable: self.REASSIGNABLE,
+                vendable: self.VENDABLE,
                 description: 'LOCK',
                 transfer_destination: null
               },
