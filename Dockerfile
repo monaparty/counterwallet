@@ -75,7 +75,7 @@ RUN if [ -n "$TRANSIFEX_USER" ] && [ -n "$TRANSIFEX_PASSWORD" ]; then echo "$TRA
 
 # Global stuff moved here to speed up build times just for code changes
 RUN npm config set strict-ssl false
-ENV PHANTOMJS_CDNURL="http://cnpmjs.org/downloads"
+#ENV PHANTOMJS_CDNURL="http://cnpmjs.org/downloads"
 
 # Install project
 COPY . /counterwallet
